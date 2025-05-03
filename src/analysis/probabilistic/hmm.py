@@ -104,7 +104,7 @@ class HMMModel:
         """
         find best number of hidden states using validation set
         """
-        X_train, X_val = train_test_split(features, test_size=test_size, shuffle=False)
+        X_train, X_val = train_test_split(features, test_size=test_size, shuffle=False, random_state=42)
         best_score = -np.inf
         best_n = None
         best_model = None  # Store the best model
@@ -326,14 +326,16 @@ class HMMModel:
         return filepath
     
 
-# for testingggggg
-# hmm = HMMModel(
-#     company='AAPL',
-#     predict_col='Close',
-#     years_data=3
-# )
+if __name__ == "__main__":
+    # Example usage
+    # Initialize the HMM model
+    hmm = HMMModel(
+        company='AAPL',
+        predict_col='Close',
+        years_data=3
+    )
 
-# # Generate 30-day forecast
-# forecast = hmm.forecast(days=30)
-# hmm.show_forecast() #this shows up the numerical results
-# hmm.plot() #this shows up the graph 
+    # # Generate 30-day forecast
+    forecast = hmm.forecast(days=30)
+    hmm.show_forecast() #this shows up the numerical results
+    hmm.plot() #this shows up the graph

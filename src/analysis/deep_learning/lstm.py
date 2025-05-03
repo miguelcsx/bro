@@ -290,13 +290,14 @@ class LSTMNetwork(nn.Module):
         return out
     
 
-# for testinggg
-# lstm = LSTMModel(
-#     company='AAPL',
-#     predict_col='Close',
-#     years_data=5
-# )
+if __name__ == "__main__":
+    # Example usage
+    lstm = LSTMModel(
+        company='AAPL',
+        predict_col='Close',
+        years_data=5
+    )
 
-# forecast = lstm.forecast(days=5)
-# lstm.save_forecast()
-# lstm.plot()
+    forecast = lstm.forecast(days=5)
+    lstm.save_forecast()
+    lstm.plot()
