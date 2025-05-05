@@ -20,6 +20,8 @@ hmmlearn = "^0.3.3"
 tqdm = "^4.67.1"
 yfinance = "^0.2.58"
 torch = "^2.7.0"
+prophet = "^1.1.6"
+plotly = "^6.0.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"

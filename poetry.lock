@@ -267,6 +267,29 @@ files = [
 colorama = {version = "*", markers = "platform_system == \"Windows\""}
 
 [[package]]
+name = "cmdstanpy"
+version = "1.2.5"
+description = "Python interface to CmdStan"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "cmdstanpy-1.2.5-py3-none-any.whl", hash = "sha256:90ae8781d80efbc62962b91974deb6033ee2f0696324eacde7188d837c36c47c"},
+    {file = "cmdstanpy-1.2.5.tar.gz", hash = "sha256:53314e934ac63d894affb36263ac062b1e0e483c368a7b691087726803917b3b"},
+]
+
+[package.dependencies]
+numpy = ">=1.21"
+pandas = "*"
+stanio = ">=0.4.0,<2.0.0"
+tqdm = "*"
+
+[package.extras]
+all = ["xarray"]
+docs = ["ipykernel", "ipython", "ipywidgets", "matplotlib", "nbsphinx", "pydata-sphinx-theme (<0.9)", "sphinx (>5,<6)", "sphinx-copybutton", "xarray"]
+test = ["flake8", "mypy", "pylint", "pytest", "pytest-cov", "pytest-order", "xarray"]
+
+[[package]]
 name = "colorama"
 version = "0.4.6"
 description = "Cross-platform colored terminal text."
@@ -644,6 +667,21 @@ docs = ["matplotlib", "pydata-sphinx-theme", "sphinx (>=2.0)", "sphinx-gallery"]
 tests = ["pytest"]
 
 [[package]]
+name = "holidays"
+version = "0.71"
+description = "Open World Holidays Framework"
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "holidays-0.71-py3-none-any.whl", hash = "sha256:15803b167b71d9ca3e45198db84ed7fce15912b81ab27ba916b088f4a8f704f3"},
+    {file = "holidays-0.71.tar.gz", hash = "sha256:3ebd9c9de0927bee90ea7bfb551c2a030ef139cf6381c7a23add94d061787466"},
+]
+
+[package.dependencies]
+python-dateutil = "*"
+
+[[package]]
 name = "httpcore"
 version = "1.0.9"
 description = "A minimal low-level HTTP client."
@@ -716,6 +754,26 @@ files = [
 
 [package.extras]
 all = ["flake8 (>=7.1.1)", "mypy (>=1.11.2)", "pytest (>=8.3.2)", "ruff (>=0.6.2)"]
+
+[[package]]
+name = "importlib-resources"
+version = "6.5.2"
+description = "Read resources from Python packages"
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "importlib_resources-6.5.2-py3-none-any.whl", hash = "sha256:789cfdc3ed28c78b67a06acb8126751ced69a3d5f79c095a98298cd8a760ccec"},
+    {file = "importlib_resources-6.5.2.tar.gz", hash = "sha256:185f87adef5bcc288449d98fb4fba07cea78bc036455dd44c5fc4a2fe78fed2c"},
+]
+
+[package.extras]
+check = ["pytest-checkdocs (>=2.4)", "pytest-ruff (>=0.2.1) ; sys_platform != \"cygwin\""]
+cover = ["pytest-cov"]
+doc = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-lint"]
+enabler = ["pytest-enabler (>=2.2)"]
+test = ["jaraco.test (>=5.4)", "pytest (>=6,!=8.1.*)", "zipp (>=3.17)"]
+type = ["pytest-mypy"]
 
 [[package]]
 name = "iniconfig"
@@ -1074,6 +1132,31 @@ files = [
     {file = "multitasking-0.0.11-py3-none-any.whl", hash = "sha256:1e5b37a5f8fc1e6cfaafd1a82b6b1cc6d2ed20037d3b89c25a84f499bd7b3dd4"},
     {file = "multitasking-0.0.11.tar.gz", hash = "sha256:4d6bc3cc65f9b2dca72fb5a787850a88dae8f620c2b36ae9b55248e51bcd6026"},
 ]
+
+[[package]]
+name = "narwhals"
+version = "1.37.1"
+description = "Extremely lightweight compatibility layer between dataframe libraries"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "narwhals-1.37.1-py3-none-any.whl", hash = "sha256:6f358a23b7351897d6efb45496dc0528918ce4ca6c8f9631594885cd873576a7"},
+    {file = "narwhals-1.37.1.tar.gz", hash = "sha256:1eb8f17ff00e6c471d5afb704e9068f41657234eb73bde2ee66ad975a170015b"},
+]
+
+[package.extras]
+cudf = ["cudf (>=24.10.0)"]
+dask = ["dask[dataframe] (>=2024.8)"]
+duckdb = ["duckdb (>=1.0)"]
+ibis = ["ibis-framework (>=6.0.0)", "packaging", "pyarrow-hotfix", "rich"]
+modin = ["modin"]
+pandas = ["pandas (>=0.25.3)"]
+polars = ["polars (>=0.20.3)"]
+pyarrow = ["pyarrow (>=11.0.0)"]
+pyspark = ["pyspark (>=3.5.0)"]
+pyspark-connect = ["pyspark[connect] (>=3.5.0)"]
+sqlframe = ["sqlframe (>=3.22.0)"]
 
 [[package]]
 name = "networkx"
@@ -1627,6 +1710,25 @@ test = ["appdirs (==1.4.4)", "covdefaults (>=2.3)", "pytest (>=8.3.4)", "pytest-
 type = ["mypy (>=1.14.1)"]
 
 [[package]]
+name = "plotly"
+version = "6.0.1"
+description = "An open-source interactive data visualization library for Python"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "plotly-6.0.1-py3-none-any.whl", hash = "sha256:4714db20fea57a435692c548a4eb4fae454f7daddf15f8d8ba7e1045681d7768"},
+    {file = "plotly-6.0.1.tar.gz", hash = "sha256:dd8400229872b6e3c964b099be699f8d00c489a974f2cfccfad5e8240873366b"},
+]
+
+[package.dependencies]
+narwhals = ">=1.15.1"
+packaging = "*"
+
+[package.extras]
+express = ["numpy"]
+
+[[package]]
 name = "pluggy"
 version = "1.5.0"
 description = "plugin and hook calling mechanisms for python"
@@ -1641,6 +1743,35 @@ files = [
 [package.extras]
 dev = ["pre-commit", "tox"]
 testing = ["pytest", "pytest-benchmark"]
+
+[[package]]
+name = "prophet"
+version = "1.1.6"
+description = "Automatic Forecasting Procedure"
+optional = false
+python-versions = ">=3.7"
+groups = ["main"]
+files = [
+    {file = "prophet-1.1.6-py3-none-macosx_10_11_x86_64.whl", hash = "sha256:f4bd565e6ff5f04d74dbf338c99d0aa353e00849c522f6e6663fdaf026bd0b46"},
+    {file = "prophet-1.1.6-py3-none-macosx_11_0_arm64.whl", hash = "sha256:29f69a98dbb4b96580decf773034b18639009c13c2f67c59a7e59a6eb2b92b0e"},
+    {file = "prophet-1.1.6-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:c0bdf573b1d89b0c0e3dc09778816a35dece000f195b2f032ff0ff8076ae0d6a"},
+    {file = "prophet-1.1.6-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:5860990c7a6da33a4381a6adab1b35f7d2ed465eeeb364c3b0f663ff69a78eca"},
+    {file = "prophet-1.1.6-py3-none-win_amd64.whl", hash = "sha256:222ec247e60e0e62fa42572bba27bd82590c7f5225f36b41a3d1762ae2ed96fd"},
+    {file = "prophet-1.1.6.tar.gz", hash = "sha256:92238aa584da69abe5c43e9426e6a4176064465e8424196655915ff86316a680"},
+]
+
+[package.dependencies]
+cmdstanpy = ">=1.0.4"
+holidays = ">=0.25,<1"
+importlib-resources = "*"
+matplotlib = ">=2.0.0"
+numpy = ">=1.15.4"
+pandas = ">=1.0.4"
+tqdm = ">=4.36.1"
+
+[package.extras]
+dev = ["jupyterlab", "nbconvert", "plotly", "pytest", "setuptools (>=64)", "wheel"]
+parallel = ["dask[dataframe]", "distributed"]
 
 [[package]]
 name = "pycparser"
@@ -2190,6 +2321,25 @@ examples = ["fastapi"]
 uvicorn = ["uvicorn (>=0.34.0)"]
 
 [[package]]
+name = "stanio"
+version = "0.5.1"
+description = "Utilities for preparing Stan inputs and processing Stan outputs"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "stanio-0.5.1-py3-none-any.whl", hash = "sha256:99ad590daa5834681245c2b651716ec2e06223853661ada21430c621521c849f"},
+    {file = "stanio-0.5.1.tar.gz", hash = "sha256:348d52f947dec431e118f4b601c4c5296929b86401d4d4dd5aa9373b0d4ae4ac"},
+]
+
+[package.dependencies]
+numpy = "*"
+
+[package.extras]
+test = ["pandas", "pytest", "pytest-cov"]
+ujson = ["ujson (>=5.5.0)"]
+
+[[package]]
 name = "starlette"
 version = "0.46.2"
 description = "The little ASGI library that shines."
@@ -2523,4 +2673,4 @@ repair = ["scipy (>=1.6.3)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "6456a5bc3a39beb75273a37ebfff78479206224630588f13e93b3b299ac21dd3"
+content-hash = "ba575cb9231d24fba0299401da202c93df1510538ccd0abf2567a2713cd444a3"
