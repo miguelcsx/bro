@@ -14,7 +14,7 @@ from src.ingestion.clients.yahoo import YahooFinanceClient
 
 warnings.filterwarnings('ignore')
 
-class GARCHVolatility:
+class GARCHModel:
     """
     GARCH volatility forecaster with training/testing visualization
     """
