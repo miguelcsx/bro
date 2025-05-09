@@ -44,7 +44,6 @@ def fbprophet_forecast(
             text=f"Error: {str(e)}",
             metadata={"company": company, "predict_col": predict_col}
         )
-'''
 @mcp_server.tool()
 def forecast_stock(
     symbol: str = Field(..., description="Company ticker symbol"),
@@ -259,4 +258,3 @@ def analyze_trend(
             "text": f"Error analyzing trend for {symbol}: {str(e)}",
             "data": None
         }
-'''

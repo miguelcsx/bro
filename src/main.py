@@ -9,6 +9,7 @@ from src.agents.quant.agent import main as agent_main
 from typing import Dict, List, Any, Optional
 from fastapi.staticfiles import StaticFiles
 
+
 app = FastAPI()
 
 # Add CORS middleware to allow requests from our Next.js frontend
@@ -21,7 +22,6 @@ app.add_middleware(
 )
 
 app.mount("/images", StaticFiles(directory="images"), name="images")
-
 class QueryRequest(BaseModel):
     query: str
 
