@@ -1,46 +1,140 @@
-# Getting Started with Create React App
+# Financial Chatbot with Interactive Charts
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A React-based financial chatbot interface with real-time stock and prediction data visualization.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- Interactive chat interface for financial queries
+- Real-time stock data visualization using recharts
+- Financial forecasting and prediction visualization
+- Responsive design that works on all devices
 
-### `npm start`
+## Getting Started
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the development server:
+   ```bash
+   npm start
+   ```
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Connecting with the Backend
 
-### `npm test`
+The frontend is designed to work with a backend API running at `http://localhost:8888/query`. The API is expected to:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1. Process natural language queries about stocks and financial predictions
+2. Return stock data, prediction data, or text responses
 
-### `npm run build`
+### API Response Format
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+The API response should follow this format:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```json
+{
+  "success": true,
+  "content": "String containing AIMessage and ToolMessage information from LangChain"
+}
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Integrating Prediction Data
 
-### `npm run eject`
+To enable prediction charts in the frontend, your backend should implement one of these approaches:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+#### Option 1: Use MCP Tools for Predictions
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+1. Create a custom MCP tool in your backend:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+```python
+@tool
+def forecast_stock(symbol: str) -> dict:
+    """
+    Generate price predictions for a stock
+    
+    Args:
+        symbol: The stock symbol to forecast
+        
+    Returns:
+        A dictionary with historical and prediction data
+    """
+    # Your forecasting logic here
+    return {
+        "historical": [
+            {"date": "2023-01-01", "price": 100.0},
+            # More historical data points...
+        ],
+        "predictions": [
+            {"date": "2023-02-01", "price": 105.0},
+            # More prediction data points...
+        ],
+        "upper_bound": [
+            {"date": "2023-02-01", "price": 110.0},
+            # More upper bound data points...
+        ],
+        "lower_bound": [
+            {"date": "2023-02-01", "price": 100.0},
+            # More lower bound data points...
+        ],
+        "prediction_type": "price", # Can be 'price', 'volatility', or 'trend'
+        "timeframe": "30D"
+    }
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+2. Configure your agent to call this tool when prediction-related queries are detected
 
-## Learn More
+#### Option 2: Add a Prediction Field to the Response
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Alternatively, you can add a dedicated field in your API response:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```json
+{
+  "success": true,
+  "content": "...",
+  "predictions": {
+    "symbol": "AAPL",
+    "name": "Apple Inc.",
+    "historical": [
+      {"date": "2023-01-01", "price": 150.0}
+    ],
+    "predictions": [
+      {"date": "2023-02-01", "price": 160.0}
+    ],
+    "upper_bound": [
+      {"date": "2023-02-01", "price": 165.0}
+    ],
+    "lower_bound": [
+      {"date": "2023-02-01", "price": 155.0}
+    ],
+    "prediction_type": "price",
+    "timeframe": "30D"
+  }
+}
+```
+
+## Customizing the Prediction Charts
+
+The prediction chart component can be customized to fit your specific needs:
+
+1. Update styles in `src/components/PredictionChart.css`
+2. Modify the chart configuration in `src/components/PredictionChart.tsx`
+3. Adjust the data processing in `src/utils/predictionHelpers.ts`
+
+## Handling Different Prediction Types
+
+The frontend supports three types of predictions:
+
+1. **Price Predictions**: Forecasts of future stock prices
+2. **Volatility Predictions**: Analysis of expected price volatility
+3. **Trend Analysis**: Directional trend predictions
+
+You can specify the prediction type in the response data's `prediction_type` field.
+
+## Testing Without Backend Integration
+
+For testing purposes, the frontend includes a mock data generator that creates realistic-looking prediction data. To use it:
+
+1. Look for the `generateMockPredictionData` function in the utilities
+2. Uncomment it and modify as needed for testing
+3. Make sure to disable it when connecting to a real backend
