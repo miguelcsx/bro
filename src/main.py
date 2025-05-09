@@ -36,24 +36,30 @@ async def agent_process_query(query: str):
     """Process a query using the quant agent and return the result."""
     try:
         from src.agents.quant.agent import create_agent_client
-        
-        # First await the coroutine to get the context manager
+
         context_manager = await create_agent_client()
-        
-        # Then use the context manager in the async with statement
+
         async with context_manager as (client, agent):
             response = await agent.ainvoke({
                 "messages": [{"role": "user", "content": query}],
             })
-            
-            # Check if response is a dict with output
-            if isinstance(response, dict) and "output" in response:
-                return {"content": response["output"], "success": True}
-            elif hasattr(response, 'content'):
-                return {"content": response.content, "success": True}
-            else:
-                return {"content": str(response), "success": True}
-            
+
+            # Extract the final AIMessage content
+            if isinstance(response, list):
+                # Look for the last AIMessage with content
+                for msg in reversed(response):
+                    if hasattr(msg, 'content') and isinstance(msg.content, str) and msg.content.strip():
+                        return {"content": msg.content.strip(), "success": True}
+                
+                # If no content found, return the last message
+                return {"content": str(response[-1]), "success": True}
+
+            # Handle direct AIMessage response
+            elif hasattr(response, 'content') and isinstance(response.content, str):
+                return {"content": response.content.strip(), "success": True}
+
+            return {"content": str(response), "success": True}
+
     except Exception as e:
         return {"error": str(e), "success": False}
 
