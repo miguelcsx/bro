@@ -1,0 +1,265 @@
+"""
+ARIMA (AutoRegressive Integrated Moving Average) model for time series forecasting.
+Simplified implementation with essential features for stock price prediction.
+"""
+
+import os 
+import numpy as np
+import pandas as pd
+import warnings
+import matplotlib.pyplot as plt
+from statsmodels.tsa.stattools import adfuller
+from statsmodels.tsa.arima.model import ARIMA
+from datetime import datetime, timedelta
+
+from src.ingestion.clients.yahoo import YahooFinanceClient
+
+warnings.filterwarnings('ignore')
+
+class ARIMAModel:
+    """ARIMA forecaster using YahooFinanceClient for data access"""
+    
+    def __init__(self, company, predict_col='Close', years_data=5, client=None):
+        self.company = company
+        self.predict_col = predict_col
+        self.years_data = years_data
+        self.client = client or YahooFinanceClient()
+        self.model = None
+        self.data = None
+        self.forecast_results = None
+        self._load_data()
+
+    def _generate_filename(self, file_type):
+        """Generate standardized filenames"""
+        date_str = datetime.now().strftime('%Y%m%d_%H%M%S')
+        return f"{self.company}_{self.predict_col}_{file_type}_{date_str}"
+    
+    def save_forecast(self):
+        """Save forecast results to CSV"""
+        if self.forecast_results is None:
+            raise ValueError("Run forecast() first")
+            
+        filename = self._generate_filename('forecast') + '.csv'
+        filepath = os.path.join('results', filename)
+        self.forecast_results.round(2).to_csv(filepath)
+        print(f"Saved forecast to {filepath}")
+        
+    def _load_data(self):
+        """Load historical data using YahooFinanceClient"""
+        end_date = datetime.now() - timedelta(days=1)
+        start_date = end_date - timedelta(days=self.years_data*365)
+        
+        # Get data from client
+        df = self.client.get_historical_data(
+            symbol=self.company,
+            start=start_date.strftime('%Y-%m-%d'),
+            end=end_date.strftime('%Y-%m-%d'),
+            interval='1d'
+        )
+        
+        # Check for empty DataFrame (e.g., symbol not found)
+        if df is None or df.empty:
+            raise ValueError(f"No historical data found for symbol '{self.company}'. Please check the ticker symbol.")
+        
+        # Validate and store data
+        if self.predict_col not in df.columns:
+            available = ', '.join(df.columns)
+            raise ValueError(f"Column '{self.predict_col}' not found. Available: {available}")
+            
+        self.data = df[self.predict_col].dropna()
+        
+        print(f"\nLoaded {len(self.data)} trading days of {self.predict_col} data")
+        print(f"Date range: {self.data.index[0].date()} - {self.data.index[-1].date()}")
+    
+    def _make_stationary(self, max_diff=3):
+        """Find optimal differencing order using ADF test"""
+        current = np.log(self.data)
+        for d in range(max_diff+1):
+            result = adfuller(current.dropna())
+            if result[1] < 0.05:
+                print(f"Stationary at d={d} (p={result[1]:.4f})")
+                return current, d
+            current = current.diff().dropna()
+        raise ValueError(f"Not stationary after {max_diff} diffs")
+    
+    def _find_best_arima(self, p_range, q_range):
+        """Grid search for best ARIMA parameters"""
+        log_series, d = self._make_stationary()
+        best_aic = np.inf
+        best_model = None
+        
+        for p in p_range:
+            for q in q_range:
+                try:
+                    model = ARIMA(log_series, order=(p, d, q))
+                    results = model.fit()
+                    if results.aic < best_aic:
+                        best_aic = results.aic
+                        best_model = results
+                        print(f"New best: ARIMA({p},{d},{q}) AIC:{results.aic:.1f}")
+                except Exception as e:
+                    print(f"Skipping ARIMA({p},{d},{q}): {str(e)}")
+                    continue
+                    
+        if not best_model:
+            raise ValueError("No valid ARIMA model found")
+            
+        self.model = best_model
+        return (p, d, q)
+    
+    def forecast(self, days=30, p_range=range(0,3), q_range=range(0,3)):
+        """Generate business day forecast with confidence intervals"""
+        # Find and fit best model
+        order = self._find_best_arima(p_range, q_range)
+        
+        # Generate predictions
+        forecast = self.model.get_forecast(steps=days)
+        pred = forecast.predicted_mean
+        conf = forecast.conf_int()
+        
+        # Reverse transformations
+        if order[1] > 0:  # Reverse differencing
+            last_value = np.log(self.data[-1])
+            pred = pred.cumsum() + last_value
+            
+        pred = np.exp(pred)
+        conf = np.exp(conf)
+        
+        # Create business day dates
+        last_date = self.data.index[-1]
+        future_dates = pd.date_range(
+            start=last_date + pd.offsets.BDay(1),
+            periods=days,
+            freq='B'
+        )
+        
+        self.forecast_results = pd.DataFrame({
+            'Predicted': pred.values,
+            'Lower': conf.iloc[:,0],
+            'Upper': conf.iloc[:,1]
+        }, index=future_dates)
+        
+        return self.forecast_results
+    
+    def plot(self, show=True):
+        """Generate and save forecast plot with improved styling"""
+        if self.forecast_results is None:
+            raise ValueError("Run forecast() first")
+
+        plt.figure(figsize=(14, 7))
+        
+        # Historical data - more prominent
+        plt.plot(self.data, 
+                label='Historical', 
+                color='#2c3e50',  # Dark blue-gray
+                linewidth=2.5,
+                alpha=0.9)
+        
+        # Forecast line - lighter and more subtle
+        plt.plot(self.forecast_results.index, 
+                self.forecast_results['Predicted'],
+                color='#e74c3c',  # Lighter red
+                linestyle='-',    # Solid but thin
+                linewidth=1.5,
+                alpha=0.7,
+                marker='',        # Remove markers
+                label=f'{len(self.forecast_results)}-Day Forecast')
+        
+        # Confidence interval - very subtle
+        plt.fill_between(self.forecast_results.index,
+                        self.forecast_results['Lower'],
+                        self.forecast_results['Upper'],
+                        color='#f39c12',  # Orange shade
+                        alpha=0.15,       # More transparent
+                        linewidth=0)      # No border
+        
+        # Forecast start indicator
+        plt.axvline(x=self.data.index[-1],
+                color='#7f8c8d',      # Gray
+                linestyle=':',
+                linewidth=1.5,
+                alpha=0.7)
+        
+        # Formatting
+        plt.title(f"{self.company} {self.predict_col} Forecast\nARIMA{self.model.model.order}",
+                fontsize=14, pad=20)
+        plt.xlabel("Date", fontsize=12)
+        plt.ylabel(f"{self.predict_col} Price ($)", fontsize=12)
+        
+        # Legend with subtle frame
+        legend = plt.legend(frameon=True)
+        frame = legend.get_frame()
+        frame.set_facecolor('white')
+        frame.set_alpha(0.8)
+        frame.set_edgecolor('#bdc3c7')
+        
+        # Grid lines
+        plt.grid(True, 
+                linestyle=':', 
+                alpha=0.4,
+                color='#95a5a6')
+        
+        # Save plot
+        filename = self._generate_filename('forecast') + '.png'
+        filepath = os.path.join('images', filename)
+        plt.savefig(filepath, 
+                dpi=300, 
+                bbox_inches='tight',
+                facecolor='white')  # White background
+        
+        if show:
+            plt.show()
+        else:
+            plt.close()
+
+        return filepath
+
+    def get_prediction_response(self, timeframe="30D"):
+        """
+        Return a dict with both text summary and structured prediction data for frontend charting.
+        Call this after running forecast().
+        """
+        if self.forecast_results is None:
+            raise ValueError("Run forecast() first")
+
+        # Prepare historical data
+        historical_data = [
+            {"date": idx.strftime("%Y-%m-%d"), "price": float(val)}
+            for idx, val in self.data.items()
+        ]
+
+        # Prepare prediction data
+        predictions = [
+            {"date": idx.strftime("%Y-%m-%d"), "price": float(row["Predicted"])}
+            for idx, row in self.forecast_results.iterrows()
+        ]
+        upper_bound = [
+            {"date": idx.strftime("%Y-%m-%d"), "price": float(row["Upper"])}
+            for idx, row in self.forecast_results.iterrows()
+        ]
+        lower_bound = [
+            {"date": idx.strftime("%Y-%m-%d"), "price": float(row["Lower"])}
+            for idx, row in self.forecast_results.iterrows()
+        ]
+
+        # Text summary
+        text = (
+            f"ARIMA forecast for {self.company}: "
+            f"The next {len(predictions)} business days are predicted. "
+            f"Expected price range at the end: "
+            f"${lower_bound[-1]['price']:.2f} - ${upper_bound[-1]['price']:.2f}."
+        )
+
+        return {
+            "text": text,
+            "data": {
+                "symbol": self.company,
+                "name": self.company,
+                "historical": historical_data,
+                "predictions": predictions,
+                "upper_bound": upper_bound,
+                "lower_bound": lower_bound,
+                "prediction_type": "price",
+                "timeframe": timeframe
+            }
+        }
