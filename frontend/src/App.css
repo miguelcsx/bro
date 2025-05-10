@@ -37,7 +37,7 @@ body {
   background: transparent;
   border: none;
   box-shadow: none;
-  padding: 0;
+  padding-top: 250px;
 }
 
 .logo-container {

@@ -1,11 +1,15 @@
-# Financial Assistant
+# Bro: Financial Assistant
 
-Built to simplify complex financial data and help you make smarter decisions, faster.
+![logo](logo.jpeg)
+
+Build to simplify complex financial data and help you make smarter decisions, faster.
 
 ## Features
 
 - AI-powered financial assistant
-- Real-time stock predictions using various models (LSTM, ARIMA, Prophet, HMM)
+- Real-time stock predictions using various Probabilistic, Deep Learning and Timeseries-Forecasting models.
+- Volatility models for measuring risk
+- Checking for overbought or oversale behavior in stocks
 - Interactive stock visualization
 - Chat interface for natural language queries
 

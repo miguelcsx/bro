@@ -214,52 +214,10 @@ class ARIMAModel:
 
         return filepath
 
-    def get_prediction_response(self, timeframe="30D"):
-        """
-        Return a dict with both text summary and structured prediction data for frontend charting.
-        Call this after running forecast().
-        """
-        if self.forecast_results is None:
-            raise ValueError("Run forecast() first")
 
-        # Prepare historical data
-        historical_data = [
-            {"date": idx.strftime("%Y-%m-%d"), "price": float(val)}
-            for idx, val in self.data.items()
-        ]
-
-        # Prepare prediction data
-        predictions = [
-            {"date": idx.strftime("%Y-%m-%d"), "price": float(row["Predicted"])}
-            for idx, row in self.forecast_results.iterrows()
-        ]
-        upper_bound = [
-            {"date": idx.strftime("%Y-%m-%d"), "price": float(row["Upper"])}
-            for idx, row in self.forecast_results.iterrows()
-        ]
-        lower_bound = [
-            {"date": idx.strftime("%Y-%m-%d"), "price": float(row["Lower"])}
-            for idx, row in self.forecast_results.iterrows()
-        ]
-
-        # Text summary
-        text = (
-            f"ARIMA forecast for {self.company}: "
-            f"The next {len(predictions)} business days are predicted. "
-            f"Expected price range at the end: "
-            f"${lower_bound[-1]['price']:.2f} - ${upper_bound[-1]['price']:.2f}."
-        )
-
-        return {
-            "text": text,
-            "data": {
-                "symbol": self.company,
-                "name": self.company,
-                "historical": historical_data,
-                "predictions": predictions,
-                "upper_bound": upper_bound,
-                "lower_bound": lower_bound,
-                "prediction_type": "price",
-                "timeframe": timeframe
-            }
-        }
+# # Example usage remains the same
+# if __name__ == "__main__":
+#     model = ARIMAModel(company='AAPL')
+#     forecast = model.forecast(days=10)
+#     print(forecast)
+#     model.plot()
