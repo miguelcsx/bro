@@ -174,7 +174,7 @@ class GARCHModel:
         }
         return forecast_dict
 
-if __name__ == "__main__":
-       model = GARCHModel(company='AAPL')
-       forecast = model.forecast(days=10)
-       print(forecast)
+# if __name__ == "__main__":
+#        model = GARCHModel(company='AAPL')
+#        forecast = model.forecast(days=10)
+#        print(forecast)

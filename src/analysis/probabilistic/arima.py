@@ -112,34 +112,52 @@ class ARIMAModel:
         # Find and fit best model
         order = self._find_best_arima(p_range, q_range)
         
-        # Generate predictions
-        forecast = self.model.get_forecast(steps=days)
-        pred = forecast.predicted_mean
-        conf = forecast.conf_int()
+        # Get last available date as tz-naive
+        last_available = self.data.index[-1]
+        if last_available.tzinfo:  # Remove timezone if present
+            last_available = last_available.tz_localize(None)
         
-        # Reverse transformations
-        if order[1] > 0:  # Reverse differencing
-            last_value = np.log(self.data[-1])
-            pred = pred.cumsum() + last_value
-            
-        pred = np.exp(pred)
-        conf = np.exp(conf)
-        
-        # Create business day dates
-        last_date = self.data.index[-1]
+        # Create business day dates starting from TOMORROW
         future_dates = pd.date_range(
-            start=last_date + pd.offsets.BDay(1),
+            start=last_available + pd.offsets.BDay(1),
             periods=days,
             freq='B'
         )
         
+        # Check if any future_dates already exist in our data
+        existing_dates = [date for date in future_dates if date in self.data.index]
+        if existing_dates:
+            print(f"Warning: {len(existing_dates)} forecast dates already exist in historical data")
+        
+        # Generate predictions only for truly future dates
+        forecast_days = len(future_dates)
+        forecast = self.model.get_forecast(steps=forecast_days)
+        pred = forecast.predicted_mean
+        conf = forecast.conf_int(alpha=0.05)  # 95% confidence intervals
+        
+        # Reverse transformations for both predictions and confidence intervals
+        if order[1] > 0:
+            last_log_value = np.log(self.data[-1])
+            # For point predictions
+            pred = pred.cumsum() + last_log_value
+            # For confidence intervals
+            conf_lower = conf.iloc[:, 0].cumsum() + last_log_value
+            conf_upper = conf.iloc[:, 1].cumsum() + last_log_value
+            conf = pd.DataFrame({'lower': conf_lower, 'upper': conf_upper})
+        
+        # Exponentiate to return to original scale
+        pred = np.exp(pred)
+        conf = np.exp(conf)
+        
+        # Create DataFrame with proper column names
         self.forecast_results = pd.DataFrame({
             'Predicted': pred.values,
-            'Lower': conf.iloc[:,0],
-            'Upper': conf.iloc[:,1]
+            'Lower': conf.iloc[:,0].values,
+            'Upper': conf.iloc[:,1].values
         }, index=future_dates)
         
         return self.forecast_results
+
     
     def get_forecast_dict(self):
         """
@@ -162,7 +180,7 @@ class ARIMAModel:
         return forecast_dict
 
  # Example usage remains the same
-# if __name__ == "__main__":
-#       model = ARIMAModel(company='AAPL')
-#       forecast = model.forecast(days=10)
-#       print(forecast)
+if __name__ == "__main__":
+    model = ARIMAModel(company='AAPL')
+    forecast = model.forecast(days=10)
+    print(forecast)
