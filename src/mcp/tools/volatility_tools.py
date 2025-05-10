@@ -23,23 +23,44 @@ def garch_volatility(
     future_days: int = Field(..., description="Number of days to forecast into the future"),
 ) -> TextContent:
     """
-    GARCH volatility tool
+    GARCH volatility forecasting tool with confidence intervals
     """
     try:
-        # Initialize the GARCH model
-        garch_model = GARCHModel(company, predict_col, years_data, future_days)
-        forecast = garch_model.forecast(days=future_days)
+        # Initialize model with proper parameters
+        garch_model = GARCHModel(
+            company=company,
+            predict_col=predict_col,
+            years_data=years_data,
+            client=yahoo_client  # Use shared Yahoo client
+        )
+
+        # Generate forecast and get structured data
+        garch_model.forecast(days=future_days)
+        forecast_data = garch_model.get_forecast_dict()
+
+        # Format for human-readable output
+        formatted_forecast = "\n".join(
+            [f"{date}: {values['Predicted']:.2f}% ({values['Lower']:.2f}-{values['Upper']:.2f})" 
+             for date, values in forecast_data.items()]
+        )
+
         return TextContent(
             type="text",
-            text=f"Forecast for {company}:\n{forecast}",
-            metadata={"company": company, "predict_col": predict_col}
+            text=f"GARCH Volatility Forecast for {company} ({predict_col}):\n{formatted_forecast}",
+            metadata={
+                "company": company,
+                "predict_col": predict_col,
+                "raw_forecast": forecast_data  # Include structured data
+            }
         )
+        
     except Exception as e:
         return TextContent(
             type="text",
             text=f"Error: {str(e)}",
             metadata={"company": company, "predict_col": predict_col}
         )
+
 
 
 @mcp_server.tool()
@@ -50,17 +71,37 @@ def xgboost_volatility(
     future_days: int = Field(..., description="Number of days to forecast into the future"),
 ) -> TextContent:
     """
-    XGBoost volatility tool
+    XGBoost volatility forecasting tool with confidence intervals
     """
     try:
-        client = YahooFinanceClient()
-        xgboost_model = XGBoostVolatility(company, predict_col, years_data, client=client)
-        forecast = xgboost_model.forecast(days=future_days)
+        # Initialize model with shared Yahoo client
+        xgboost_model = XGBoostVolatility(
+            company=company,
+            predict_col=predict_col,
+            years_data=years_data,
+            client=yahoo_client  # Use pre-configured client
+        )
+
+        # Generate forecast and get structured data
+        xgboost_model.forecast(days=future_days)
+        forecast_data = xgboost_model.get_forecast_dict()
+
+        # Format for human-readable output
+        formatted_forecast = "\n".join(
+            [f"{date}: ${values['Predicted']:.2f} (${values['Lower']:.2f}-${values['Upper']:.2f})" 
+             for date, values in forecast_data.items()]
+        )
+
         return TextContent(
             type="text",
-            text=f"Forecast for {company}:\n{forecast}",
-            metadata={"company": company, "predict_col": predict_col}
+            text=f"XGBoost Volatility Forecast for {company} ({predict_col}):\n{formatted_forecast}",
+            metadata={
+                "company": company,
+                "predict_col": predict_col,
+                "raw_forecast": forecast_data  # Structured data for APIs
+            }
         )
+        
     except Exception as e:
         return TextContent(
             type="text",

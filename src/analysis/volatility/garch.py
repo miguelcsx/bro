@@ -154,99 +154,27 @@ class GARCHModel:
         
         return self.forecast_results
     
-    def plot(self, show=True):
-        """Generate centered volatility plot"""
-        if self.forecast_results is None or self.training_results is None:
+    def get_forecast_dict(self):
+        """
+        Return the forecast results as a dictionary.
+        The dictionary keys are the forecasted dates (as strings),
+        and the values are dicts with 'Predicted', 'Lower', and 'Upper'.
+        """
+        if self.forecast_results is None:
             raise ValueError("Run forecast() first")
+        
+        # Convert index to string for JSON-friendly output
+        forecast_dict = {
+            str(idx.date()): {
+                'Predicted': float(row['Predicted']),
+                'Lower': float(row['Lower']),
+                'Upper': float(row['Upper'])
+            }
+            for idx, row in self.forecast_results.iterrows()
+        }
+        return forecast_dict
 
-        # Create figure with adjusted size and layout
-        fig = plt.figure(figsize=(14, 8))
-        
-        # Get the model parameters from the specification
-        p = self.model.volatility.p
-        q = self.model.volatility.q
-        
-        # Create a single axis that takes up most of the figure with margins
-        ax = fig.add_axes([0.1, 0.1, 0.8, 0.8])  # [left, bottom, width, height]
-        
-        # Main plot - Historical and forecasted volatility
-        returns = self._compute_returns()
-        historical_vol = returns.rolling(30).std() * np.sqrt(252)
-        
-        ax.plot(historical_vol, 
-                label='Historical Volatility (30-day)', 
-                color='#2c3e50',
-                linewidth=2)
-        
-        # Training vs actual
-        ax.plot(self.training_results.index,
-                self.training_results['True Volatility'],
-                color='#27ae60',
-                linewidth=2,
-                label='Actual Volatility (Test Set)')
-        
-        ax.plot(self.training_results.index,
-                self.training_results['Predicted Volatility'],
-                color='#e74c3c',
-                linewidth=2,
-                linestyle='--',
-                label='Predicted Volatility (Test Set)')
-        
-        # Future forecast
-        ax.plot(self.forecast_results.index,
-                self.forecast_results['Volatility'],
-                color='#F68E5F',
-                linewidth=2,
-                marker='*',
-                markersize=8,
-                label='Forecasted Volatility')
-        
-        ax.fill_between(self.forecast_results.index,
-                        self.forecast_results['Lower'],
-                        self.forecast_results['Upper'],
-                        color='#3498db',
-                        alpha=0.1)
-        
-        ax.axvline(x=self.training_results.index[0],
-                color='#7f8c8d',
-                linestyle=':',
-                linewidth=1.5,
-                alpha=0.7)
-        
-        ax.axvline(x=self.data.index[-1],
-                color='#7f8c8d',
-                linestyle=':',
-                linewidth=1.5,
-                alpha=0.7)
-        
-        ax.set_title(f"{self.company} Volatility Forecast\nGARCH({p},{q}) Model", 
-                    fontsize=16, pad=20)
-        ax.set_ylabel("Annualized Volatility (%)", fontsize=12)
-        ax.legend(fontsize=10, loc='upper right')
-        ax.grid(True, linestyle=':', alpha=0.4)
-        
-        # Adjust x-axis labels to prevent crowding
-        ax.xaxis.set_major_locator(plt.MaxNLocator(10))
-        
-        # Save plot
-        os.makedirs('images', exist_ok=True)
-        filename = self._generate_filename('volatility_analysis') + '.png'
-        filepath = os.path.join('images', filename)
-        plt.savefig(filepath, dpi=300, bbox_inches='tight')
-        
-        if show:
-            plt.show()
-        else:
-            plt.close()
-
-        return filepath
-
-#
-# garch = GARCHVolatility(
-#     company='AAPL',
-#     predict_col='Close',
-#     years_data=10
-# )
-# vol_forecast = garch.forecast(days=30)
-# garch.save_forecast()
-# garch.plot()
+if __name__ == "__main__":
+       model = GARCHModel(company='AAPL')
+       forecast = model.forecast(days=10)
+       print(forecast)

@@ -18,9 +18,9 @@ def arima_forecast(
     predict_col: str = Field(..., description="Column to predict (e.g., 'Close')"),
     years_data: int = Field(..., description="Number of years of historical data to use"),
     future_days: int = Field(..., description="Number of days to forecast into the future"),
-) -> dict:
+) -> TextContent:
     """
-    ARIMA forecast tool
+    ARIMA forecast tool returning structured forecast data
     """
     try:        
         # Initialize the ARIMA model
@@ -31,29 +31,43 @@ def arima_forecast(
             client=yahoo_client
         )
 
-        # Generate forecast
+        # Generate forecast and get dictionary
         arima_model.forecast(days=future_days)
+        forecast_data = arima_model.get_forecast_dict()
 
-        # Get both text and structured prediction data
-        response = arima_model.get_prediction_response(timeframe=f"{future_days}D")
-        return response
+        # Format dictionary for readable output
+        formatted_output = "\n".join(
+            [f"{date}: ${values['Predicted']:.2f} (${values['Lower']:.2f}-${values['Upper']:.2f})" 
+             for date, values in forecast_data.items()]
+        )
+
+        return TextContent(
+            type="text",
+            text=f"ARIMA Forecast for {company} ({predict_col}):\n{formatted_output}",
+            metadata={
+                "company": company,
+                "predict_col": predict_col,
+                "raw_forecast": forecast_data  # Include structured data
+            }
+        )
 
     except Exception as e:
-        return {
-            "text": f"Error: {str(e)}",
-            "data": None,
-            "metadata": {"company": company, "predict_col": predict_col}
-        }
+        return TextContent(
+            type="text",
+            text=f"Error: {str(e)}",
+            metadata={"company": company, "predict_col": predict_col}
+        )
+
 
 @mcp_server.tool()
-def hmm_forescast(
+def hmm_forecast(
     company: str = Field(..., description="Company ticker symbol"),
     predict_col: str = Field(..., description="Column to predict (e.g., 'Close')"),
     years_data: int = Field(..., description="Number of years of historical data to use"),
     future_days: int = Field(..., description="Number of days to forecast into the future"),
 ) -> TextContent:
     """
-    HMM forecast tool
+    HMM forecast tool returning structured forecast data
     """
     try:
         # Initialize the HMM model
@@ -64,19 +78,24 @@ def hmm_forescast(
             client=yahoo_client
         )
 
-        # Generate forecast
-        forecast = hmm.forecast(days=future_days)
-
-        # Save forecast results
-        # hmm.save_forecast()
-
-        img = PILImage.open(hmm.plot(show=False))
-        img.thumbnail((100, 100))
+        # Generate forecast and get dictionary
+        hmm.forecast(days=future_days)
+        forecast_data = hmm.get_forecast_dict()
+        
+        # Format dictionary for readable output
+        formatted_output = "\n".join(
+            [f"{date}: ${values['Predicted']:.2f} (${values['Lower']:.2f}-${values['Upper']:.2f})" 
+             for date, values in forecast_data.items()]
+        )
 
         return TextContent(
             type="text",
-            text=f"Forecast for {company}:\n{forecast}",
-            metadata={"company": company, "predict_col": predict_col}
+            text=f"HMM Forecast for {company} ({predict_col}):\n{formatted_output}",
+            metadata={
+                "company": company,
+                "predict_col": predict_col,
+                "raw_forecast": forecast_data  # Include structured data
+            }
         )
 
     except Exception as e:
@@ -85,3 +104,4 @@ def hmm_forescast(
             text=f"Error: {str(e)}",
             metadata={"company": company, "predict_col": predict_col}
         )
+

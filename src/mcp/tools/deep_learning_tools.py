@@ -19,7 +19,7 @@ def lstm_forecast(
     future_days: int = Field(..., description="Number of days to forecast into the future"),
 ) -> TextContent:
     """
-    LSTM forecast tool
+    LSTM forecast tool returning structured forecast data
     """
     try:
         # Initialize the LSTM model
@@ -30,19 +30,24 @@ def lstm_forecast(
             client=yahoo_client
         )
 
-        # Generate forecast
-        forecast = lstm_model.forecast(days=future_days)
+        # Generate forecast and get dictionary
+        lstm_model.forecast(days=future_days)
+        forecast_data = lstm_model.get_forecast_dict()
 
-        # Save forecast results
-        # lstm_model.save_forecast()
-
-        img = PILImage.open(lstm_model.plot(show=False))
-        img.thumbnail((100, 100))
+        # Format dictionary for readable output
+        formatted_output = "\n".join(
+            [f"{date}: ${values['Predicted']:.2f} (${values['Lower']:.2f}-${values['Upper']:.2f})" 
+             for date, values in forecast_data.items()]
+        )
 
         return TextContent(
             type="text",
-            text=f"Forecast for {company}:\n{forecast}",
-            metadata={"company": company, "predict_col": predict_col}
+            text=f"LSTM Forecast for {company} ({predict_col}):\n{formatted_output}",
+            metadata={
+                "company": company,
+                "predict_col": predict_col,
+                "raw_forecast": forecast_data  # Include structured data
+            }
         )
     except Exception as e:
         return TextContent(
@@ -50,3 +55,4 @@ def lstm_forecast(
             text=f"Error: {str(e)}",
             metadata={"company": company, "predict_col": predict_col}
         )
+
