@@ -1,4 +1,3 @@
-```markdown
 # Bro: Financial Assistant
 
 ![logo](logo.jpeg)
@@ -121,7 +120,7 @@ You can ask the assistant questions about stocks, such as:
 
 ## Api Key
 
-In order to use Bro on your local machine, you must create a `.env` file and set the GEMINI_API_KEY=api_key variable. For the development of this project, we used a free trial Gemini API key. We want you to be able to use it as well, so we've created a new Gemini API key with a free trial (note: this means only a limited number of questions and attempts are allowed before reaching the token limit). However, it is perfectly suitable for trying out Bro. The api key is: `AIzaSyDOqUQzvkNoDPgFZVggPTTa55eXvAZhP9Y`
+In order to use Bro on your local machine, you must create a `.env` file and set the `GEMINI_API_KEY=api_key variable`. For the development of this project, we used a free trial Gemini API key. We want you to be able to use it as well, so we've created a new Gemini API key with a free trial (note: this means only a limited number of questions and attempts are allowed before reaching the token limit). However, it is perfectly suitable for trying out Bro. The api key is: `AIzaSyDOqUQzvkNoDPgFZVggPTTa55eXvAZhP9Y`
 
 ## References
 
