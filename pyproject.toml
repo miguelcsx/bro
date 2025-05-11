@@ -28,6 +28,11 @@ langgraph = "^0.4.1"
 langchain = "^0.3.25"
 fastapi = "^0.115.12"
 arch = "^7.2.0"
+xgboost = "^3.0.0"
+pmdarima = "^2.0.4"
+lightgbm = "^4.6.0"
+catboost = "^1.2.8"
+pykalman = {version = "^0.10.1", python = ">=3.11,<3.14"}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"

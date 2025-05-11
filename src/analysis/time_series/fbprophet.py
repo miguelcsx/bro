@@ -132,90 +132,27 @@ class FBProphetModel:
         
         return self.forecast_results
 
-    def plot(self, show=True):
+    def get_forecast_dict(self):
         """
-        Generate and save forecast plot
+        Return the forecast results as a dictionary.
+        The dictionary keys are the forecasted dates (as strings),
+        and the values are dicts with 'Predicted', 'Lower', and 'Upper'.
         """
         if self.forecast_results is None:
             raise ValueError("Run forecast() first")
-        plt.figure(figsize=(14, 7))
         
-        # Historical data
-        plt.plot(self.data.set_index('ds')['y'], 
-                label='Historical', 
-                color='#2c3e50',
-                linewidth=2.5,
-                alpha=0.9)
-        
-        # Forecast line
-        plt.plot(self.forecast_results.index, 
-                self.forecast_results['Predicted'],
-                color='#e74c3c',
-                linestyle='-',
-                linewidth=1.5,
-                alpha=0.7,
-                label=f'{len(self.forecast_results)}-Day Forecast')
-        
-        # Confidence interval
-        plt.fill_between(self.forecast_results.index,
-                        self.forecast_results['Lower'],
-                        self.forecast_results['Upper'],
-                        color='#f39c12',
-                        alpha=0.15,
-                        linewidth=0)
-        
-        # Forecast start indicator
-        plt.axvline(x=self.data['ds'].iloc[-1],
-                color='#7f8c8d',
-                linestyle=':',
-                linewidth=1.5,
-                alpha=0.7)
-        
-        # Formatting
-        plt.title(f"{self.company} {self.predict_col} Forecast\nFacebook Prophet",
-                fontsize=14, pad=20)
-        plt.xlabel("Date", fontsize=12)
-        plt.ylabel(f"{self.predict_col} Price ($)", fontsize=12)
-        
-        # Legend
-        legend = plt.legend(frameon=True)
-        frame = legend.get_frame()
-        frame.set_facecolor('white')
-        frame.set_alpha(0.8)
-        
-        # Grid lines
-        plt.grid(True, linestyle=':', alpha=0.4)
-        
-        # Save plot
-        filename = self._generate_filename('forecast') + '.png'
-        filepath = os.path.join('images', filename)
-        plt.savefig(filepath, dpi=300, bbox_inches='tight')
-        
-        if show:
-            plt.show()
-        else:
-            plt.close()
-        return filepath
+        # Convert index to string for JSON-friendly output
+        forecast_dict = {
+            str(idx.date()): {
+                'Predicted': float(row['Predicted']),
+                'Lower': float(row['Lower']),
+                'Upper': float(row['Upper'])
+            }
+            for idx, row in self.forecast_results.iterrows()
+        }
+        return forecast_dict
     
-    def plot_components(self):
-        """Plot forecast components (trend, weekly/yearly seasonality)"""
-        if self.model is None:
-            raise ValueError("Run forecast() first")
-            
-        fig = self.model.plot_components(self.forecast_results)
-        filename = self._generate_filename('components') + '.png'
-        filepath = os.path.join('images', filename)
-        fig.savefig(filepath, dpi=300, bbox_inches='tight')
-        return filepath
-    
-# for testing bros bro bros
-# if __name__ == "__main__":
-#     prophet = FBProphetModel(
-#         company='AAPL',
-#         predict_col='Close',
-#         years_data=5
-#     )
-
-#     forecast = prophet.forecast(days=30)
-#     prophet.save_forecast()
-#     prophet.plot()
+if __name__ == "__main__":
+       model = FBProphetModel(company='AAPL')
+       forecast = model.forecast(days=10)
+       print(forecast)

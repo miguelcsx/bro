@@ -193,80 +193,25 @@ class LSTMModel:
         
         return self.forecast_results
 
-    def plot(self, show=True):
+    def get_forecast_dict(self):
         """
-        generate and save forecast plot
+        Return the forecast results as a dictionary.
+        The dictionary keys are the forecasted dates (as strings),
+        and the values are dicts with 'Predicted', 'Lower', and 'Upper'.
         """
         if self.forecast_results is None:
             raise ValueError("Run forecast() first")
-
-        plt.figure(figsize=(14, 7))
         
-        # Historical data - more prominent
-        plt.plot(self.data, 
-                label='Historical', 
-                color='#2c3e50',  # Dark blue-gray
-                linewidth=2.5,
-                alpha=0.9)
-        
-        # Forecast line - lighter and more subtle
-        plt.plot(self.forecast_results.index, 
-                self.forecast_results['Predicted'],
-                color='#e74c3c',  # Lighter red
-                linestyle='-',    # Solid but thin
-                linewidth=1.5,
-                alpha=0.7,
-                marker='',        # Remove markers
-                label=f'{len(self.forecast_results)}-Day Forecast')
-        
-        # Confidence interval - very subtle
-        plt.fill_between(self.forecast_results.index,
-                        self.forecast_results['Lower'],
-                        self.forecast_results['Upper'],
-                        color='#f39c12',  # Orange shade
-                        alpha=0.15,       # More transparent
-                        linewidth=0)      # No border
-        
-        # Forecast start indicator
-        plt.axvline(x=self.data.index[-1],
-                color='#7f8c8d',      # Gray
-                linestyle=':',
-                linewidth=1.5,
-                alpha=0.7)
-        
-        # Formatting
-        plt.title(f"{self.company} {self.predict_col} Forecast\nLSTM Model",
-                fontsize=14, pad=20)
-        plt.xlabel("Date", fontsize=12)
-        plt.ylabel(f"{self.predict_col} Price ($)", fontsize=12)
-        
-        # Legend with subtle frame
-        legend = plt.legend(frameon=True)
-        frame = legend.get_frame()
-        frame.set_facecolor('white')
-        frame.set_alpha(0.8)
-        frame.set_edgecolor('#bdc3c7')
-        
-        # Grid lines
-        plt.grid(True, 
-                linestyle=':', 
-                alpha=0.4,
-                color='#95a5a6')
-        
-        # Save plot
-        filename = self._generate_filename('forecast') + '.png'
-        filepath = os.path.join('images', filename)
-        plt.savefig(filepath, 
-                dpi=300, 
-                bbox_inches='tight',
-                facecolor='white')  # White background
-        
-        if show:
-            plt.show()
-        else:
-            plt.close()
-
-        return filepath
+        # Convert index to string for JSON-friendly output
+        forecast_dict = {
+            str(idx.date()): {
+                'Predicted': float(row['Predicted']),
+                'Lower': float(row['Lower']),
+                'Upper': float(row['Upper'])
+            }
+            for idx, row in self.forecast_results.iterrows()
+        }
+        return forecast_dict
 
 
 class LSTMNetwork(nn.Module):
@@ -291,13 +236,6 @@ class LSTMNetwork(nn.Module):
     
 
 if __name__ == "__main__":
-    # Example usage
-    lstm = LSTMModel(
-        company='AAPL',
-        predict_col='Close',
-        years_data=5
-    )
-
-    forecast = lstm.forecast(days=5)
-    lstm.save_forecast()
-    lstm.plot()
+       model = LSTMModel(company='AAPL')
+       forecast = model.forecast(days=10)
+       print(forecast)

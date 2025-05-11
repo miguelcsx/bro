@@ -57,6 +57,10 @@ class ARIMAModel:
             interval='1d'
         )
         
+        # Check for empty DataFrame (e.g., symbol not found)
+        if df is None or df.empty:
+            raise ValueError(f"No historical data found for symbol '{self.company}'. Please check the ticker symbol.")
+        
         # Validate and store data
         if self.predict_col not in df.columns:
             available = ', '.join(df.columns)
@@ -108,104 +112,75 @@ class ARIMAModel:
         # Find and fit best model
         order = self._find_best_arima(p_range, q_range)
         
-        # Generate predictions
-        forecast = self.model.get_forecast(steps=days)
-        pred = forecast.predicted_mean
-        conf = forecast.conf_int()
+        # Get last available date as tz-naive
+        last_available = self.data.index[-1]
+        if last_available.tzinfo:  # Remove timezone if present
+            last_available = last_available.tz_localize(None)
         
-        # Reverse transformations
-        if order[1] > 0:  # Reverse differencing
-            last_value = np.log(self.data[-1])
-            pred = pred.cumsum() + last_value
-            
-        pred = np.exp(pred)
-        conf = np.exp(conf)
-        
-        # Create business day dates
-        last_date = self.data.index[-1]
+        # Create business day dates starting from TOMORROW
         future_dates = pd.date_range(
-            start=last_date + pd.offsets.BDay(1),
+            start=last_available + pd.offsets.BDay(1),
             periods=days,
             freq='B'
         )
         
+        # Check if any future_dates already exist in our data
+        existing_dates = [date for date in future_dates if date in self.data.index]
+        if existing_dates:
+            print(f"Warning: {len(existing_dates)} forecast dates already exist in historical data")
+        
+        # Generate predictions only for truly future dates
+        forecast_days = len(future_dates)
+        forecast = self.model.get_forecast(steps=forecast_days)
+        pred = forecast.predicted_mean
+        conf = forecast.conf_int(alpha=0.05)  # 95% confidence intervals
+        
+        # Reverse transformations for both predictions and confidence intervals
+        if order[1] > 0:
+            last_log_value = np.log(self.data[-1])
+            # For point predictions
+            pred = pred.cumsum() + last_log_value
+            # For confidence intervals
+            conf_lower = conf.iloc[:, 0].cumsum() + last_log_value
+            conf_upper = conf.iloc[:, 1].cumsum() + last_log_value
+            conf = pd.DataFrame({'lower': conf_lower, 'upper': conf_upper})
+        
+        # Exponentiate to return to original scale
+        pred = np.exp(pred)
+        conf = np.exp(conf)
+        
+        # Create DataFrame with proper column names
         self.forecast_results = pd.DataFrame({
             'Predicted': pred.values,
-            'Lower': conf.iloc[:,0],
-            'Upper': conf.iloc[:,1]
+            'Lower': conf.iloc[:,0].values,
+            'Upper': conf.iloc[:,1].values
         }, index=future_dates)
         
         return self.forecast_results
+
     
-    def plot(self, show=True):
-        """Generate and save forecast plot with improved styling"""
+    def get_forecast_dict(self):
+        """
+        Return the forecast results as a dictionary.
+        The dictionary keys are the forecasted dates (as strings),
+        and the values are dicts with 'Predicted', 'Lower', and 'Upper'.
+        """
         if self.forecast_results is None:
             raise ValueError("Run forecast() first")
+        
+        # Convert index to string for JSON-friendly output
+        forecast_dict = {
+            str(idx.date()): {
+                'Predicted': float(row['Predicted']),
+                'Lower': float(row['Lower']),
+                'Upper': float(row['Upper'])
+            }
+            for idx, row in self.forecast_results.iterrows()
+        }
+        return forecast_dict
 
-        plt.figure(figsize=(14, 7))
-        
-        # Historical data - more prominent
-        plt.plot(self.data, 
-                label='Historical', 
-                color='#2c3e50',  # Dark blue-gray
-                linewidth=2.5,
-                alpha=0.9)
-        
-        # Forecast line - lighter and more subtle
-        plt.plot(self.forecast_results.index, 
-                self.forecast_results['Predicted'],
-                color='#e74c3c',  # Lighter red
-                linestyle='-',    # Solid but thin
-                linewidth=1.5,
-                alpha=0.7,
-                marker='',        # Remove markers
-                label=f'{len(self.forecast_results)}-Day Forecast')
-        
-        # Confidence interval - very subtle
-        plt.fill_between(self.forecast_results.index,
-                        self.forecast_results['Lower'],
-                        self.forecast_results['Upper'],
-                        color='#f39c12',  # Orange shade
-                        alpha=0.15,       # More transparent
-                        linewidth=0)      # No border
-        
-        # Forecast start indicator
-        plt.axvline(x=self.data.index[-1],
-                color='#7f8c8d',      # Gray
-                linestyle=':',
-                linewidth=1.5,
-                alpha=0.7)
-        
-        # Formatting
-        plt.title(f"{self.company} {self.predict_col} Forecast\nARIMA{self.model.model.order}",
-                fontsize=14, pad=20)
-        plt.xlabel("Date", fontsize=12)
-        plt.ylabel(f"{self.predict_col} Price ($)", fontsize=12)
-        
-        # Legend with subtle frame
-        legend = plt.legend(frameon=True)
-        frame = legend.get_frame()
-        frame.set_facecolor('white')
-        frame.set_alpha(0.8)
-        frame.set_edgecolor('#bdc3c7')
-        
-        # Grid lines
-        plt.grid(True, 
-                linestyle=':', 
-                alpha=0.4,
-                color='#95a5a6')
-        
-        # Save plot
-        filename = self._generate_filename('forecast') + '.png'
-        filepath = os.path.join('images', filename)
-        plt.savefig(filepath, 
-                dpi=300, 
-                bbox_inches='tight',
-                facecolor='white')  # White background
-        
-        if show:
-            plt.show()
-        else:
-            plt.close()
-
-        return filepath
+ # Example usage remains the same
+# if __name__ == "__main__":
+#     model = ARIMAModel(company='AAPL')
+#     forecast = model.forecast(days=10)
+#     print(forecast)
