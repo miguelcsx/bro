@@ -6,6 +6,9 @@
   --border: #e1e1e1;
   --accent-green: #22c55e;
   --accent-red: #ef4444;
+  --sidebar-bg: #AEBD93;
+  --sidebar-hover: #010101;
+  --sidebar-border: #e1e1e1;
 }
 
 * {
@@ -21,23 +24,30 @@ body {
   margin: 0;
 }
 
-.app {
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem;
+/* App container and layout */
+.app-container {
   display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
+  background: var(--bg);
 }
 
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  width: 100%;
+}
+
+/* Header and logo */
 .header {
   text-align: center;
   margin-bottom: 1rem;
   background: transparent;
   border: none;
   box-shadow: none;
-  /* Remove or reduce the padding */
   padding-top: 1.5rem;
   padding-bottom: 1.5rem;
 }
@@ -75,6 +85,7 @@ body {
   font-weight: 400;
 }
 
+/* Chat container and messages */
 .chat-container {
   flex: 1;
   display: flex;
@@ -83,9 +94,9 @@ body {
   border-radius: 0;
   box-shadow: none;
   margin: 0;
-  padding: 0;
+  padding: 2rem;
+  overflow-y: auto;
   min-height: 0;
-  /* Make sure it grows to fill the space */
   height: 100%;
 }
 
@@ -109,16 +120,15 @@ body {
   padding: 0;
   width: 100%;
   min-height: 0;
-  /* Take all available space */
   height: 100%;
 }
 
-
 .message {
-  max-width: 80%;
+  max-width: 100%;
   padding: 0.75rem 1rem;
   border-radius: 1rem;
   line-height: 1.4;
+  margin: 1rem 0;
 }
 
 .message.user {
@@ -135,23 +145,14 @@ body {
   color: var(--text);
 }
 
-/* StockCard adjustments */
-.message.assistant .stock-card {
-  width: 100%;
-  margin-bottom: 0;
-  background: white;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 1rem;
-}
-
+/* Input area */
 .input-container {
   width: 100%;
   max-width: 100%;
   display: flex;
   gap: 0.5rem;
   padding: 0.75rem 0;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid #404E4D;
   background: transparent;
   margin-top: auto;
 }
@@ -160,7 +161,7 @@ body {
   flex: 1;
   padding: 0.75rem 1rem;
   border-radius: 1.5rem;
-  border: 1px solid var(--border);
+  border: 1px solid #404E4D;
   font-size: 1rem;
   outline: none;
   transition: border-color 0.2s;
@@ -176,8 +177,8 @@ body {
   width: 3rem;
   height: 3rem;
   border-radius: 50%;
-  border: none;
-  background: var(--primary);
+  border: 1px solid #404E4D;
+  background: #AEBD93;
   color: white;
   font-size: 1.2rem;
   cursor: pointer;
@@ -188,82 +189,101 @@ body {
 }
 
 .input-container button:hover {
-  background: #0d47a1;
+  background: #404E4D;
   transform: scale(1.05);
 }
 
-/* Loading indicator */
-.message.assistant:last-child {
+/* Sidebar styles */
+.collapsible-sidebar {
   position: relative;
+  width: 60px;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--sidebar-border);
+  transition: width 0.3s cubic-bezier(.4,0,.2,1);
+  min-height: 100vh;
+  z-index: 10;
+  border-radius: 7px;
+  border: #404E4D
 }
 
-.message.assistant:last-child::after {
-  content: "";
-  display: inline-block;
-  width: 0.5rem;
-  height: 0.5rem;
-  margin-left: 0.5rem;
-  background-color: var(--primary);
-  border-radius: 50%;
-  animation: blink 1s infinite;
+.collapsible-sidebar.open {
+  width: 260px;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.04);
 }
 
-@keyframes blink {
-  0%, 100% { opacity: 0.2; }
-  50% { opacity: 1; }
-}
-
-@media (max-width: 600px) {
-  .app {
-    padding: 1rem;
-  }
-  
-  .logo-container {
-    flex-direction: column;
-    text-align: center;
-    gap: 0.5rem;
-  }
-  
-  .message {
-    max-width: 90%;
-  }
-  
-  .chat-container {
-    margin: 0;
-  }
-}
-
-/* Add these new styles */
-.app-container {
+.sidebar-toggle-btn {
   display: flex;
-  height: 100vh;
-  background: #f5f5f5;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  outline: none;
+  transition: background 0.2s;
+  margin-bottom: 0rem;
+  padding-top: 24px;
+}
+
+.sidebar-toggle-btn img {
+  width: 40px;
+  height: 40px;
+  transition: transform 0.3s ease;
+  border-radius: 5px;
+}
+
+.collapsible-sidebar.open .sidebar-toggle-btn {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.collapsible-sidebar.open .sidebar-toggle-btn img {
+  transform: scale(1.2);
 }
 
 .history-panel {
-  width: 25%;
-  background: white;
-  border-right: 1px solid #eee;
+  width: 200px;
   padding: 1rem;
+  padding-right: 0.5rem;
+  background: var(--sidebar-bg);
+  height: calc(100vh - 60px);
   overflow-y: auto;
+  transition: opacity 0.3s;
+  opacity: 1;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e0 transparent;
+}
+
+.collapsible-sidebar:not(.open) .history-panel {
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  padding: 0;
 }
 
 .history-panel h3 {
-  margin-bottom: 1rem;
-  color: var(--primary);
+  color: #333;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: normal;
+  margin-bottom: 0rem;
 }
 
 .history-panel ul {
   list-style: none;
+  padding: 0;
 }
 
 .history-panel li {
   padding: 0.75rem;
   margin: 0.5rem 0;
-  background: #f8f9fa;
+  background: var(--sidebar-hover);
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.2s;
 }
 
 .history-panel li:hover {
@@ -277,12 +297,27 @@ body {
   margin-top: 0.25rem;
 }
 
-.main-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  max-width: 75%;
-  height: 100vh; /* Make sure it fills the viewport */
+/* Custom scrollbar */
+.history-panel::-webkit-scrollbar {
+  width: 6px;
+  background-color: transparent;
+}
+
+.history-panel::-webkit-scrollbar-thumb {
+  background-color: #cbd5e0;
+  border-radius: 3px;
+}
+
+.history-panel::-webkit-scrollbar-thumb:hover {
+  background-color: #a0aec0;
+}
+
+/* Visualization components */
+.response-container {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 15px rgba(0,0,0,0.1);
 }
 
 .prediction-chart {
@@ -293,22 +328,34 @@ body {
   margin: 1rem 0;
 }
 
-/* Update existing styles */
-.app {
+.prediction-table {
   width: 100%;
-  max-width: none;
-  padding: 0;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
 }
 
-.chat-container {
-  flex: 1;
-  padding: 2rem;
-  overflow-y: auto;
+.prediction-table th,
+.prediction-table td {
+  padding: 0.75rem 1rem;
+  text-align: center;
 }
 
-.message {
-  max-width: 100%;
-  margin: 1rem 0;
+.prediction-table th {
+  background: #AEBD93;
+  color: white;
+  font-weight: 600;
+}
+
+.prediction-table tr:nth-child(even) {
+  background: #f5f5f5;
+}
+
+.prediction-table td {
+  font-family: 'Courier New', monospace;
 }
 
 .stock-card {
@@ -340,68 +387,49 @@ body {
 .stock-card .negative {
   color: var(--accent-red);
 }
-.prediction-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-  background: #fff;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+
+/* Loading indicator */
+.message.assistant:last-child {
+  position: relative;
 }
 
-.prediction-table th,
-.prediction-table td {
-  padding: 0.75rem 1rem;
-  text-align: center;
+.message.assistant:last-child::after {
+  content: "";
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-left: 0.5rem;
+  background-color: var(--primary);
+  border-radius: 50%;
+  animation: blink 1s infinite;
 }
 
-.prediction-table th {
-  background: #1565c0;
-  color: #fff;
-  font-weight: 600;
+@keyframes blink {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
 }
 
-.prediction-table tr:nth-child(even) {
-  background: #f5f5f5;
+/* Responsive */
+@media (max-width: 600px) {
+  .main-content {
+    padding: 1rem;
+  }
+  
+  .logo-container {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+  
+  .message {
+    max-width: 90%;
+  }
+  
+  .collapsible-sidebar.open {
+    position: absolute;
+    width: 80vw;
+    min-width: 0;
+    max-width: 90vw;
+    z-index: 100;
+  }
 }
-
-.forecast-header {
-  margin-bottom: 1.5rem;
-  text-align: center;
-}
-
-.forecast-header h3 {
-  color: #2c3e50;
-  margin-bottom: 0.25rem;
-}
-
-.timeframe {
-  color: #7f8c8d;
-  font-size: 0.9rem;
-}
-
-/* Table Enhancements */
-.prediction-table {
-  margin: 1.5rem 0;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-}
-
-.prediction-table th {
-  background: #3498db;
-  color: white;
-}
-
-.prediction-table td {
-  font-family: 'Courier New', monospace;
-}
-
-/* Chart Container */
-.response-container {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 10px;
-  box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-}
-

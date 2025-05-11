@@ -12,8 +12,8 @@ interface HistoryPanelProps {
 
 const HistoryPanel: React.FC<HistoryPanelProps> = ({ history, onSelect }) => {
   return (
-    <div className="history-panel">
-      <h3>Query History</h3>
+    <>
+      <h3>Bro's keeping your questions</h3>
       <ul>
         {history.map((item, index) => (
           <li key={index} onClick={() => onSelect(item.query)}>
@@ -22,7 +22,7 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({ history, onSelect }) => {
           </li>
         ))}
       </ul>
-    </div>
+    </>
   );
 };
 

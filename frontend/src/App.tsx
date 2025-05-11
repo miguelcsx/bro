@@ -55,18 +55,17 @@ function App() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const parseStockInfo = async (content: string): Promise<StockData | null> => {
     return null;
   };
 
   const parsePredictionData = (content: string, apiResponse: any): PredictionData | null => {
-    // First check if the API response contains structured data
     if (apiResponse.metadata?.raw_forecast) {
       return apiResponse.metadata.raw_forecast;
     }
 
-    // Fallback to text parsing if structured data isn't available
     const predictionPattern = /(\d{4}-\d{2}-\d{2}): \$([\d.]+) \(\$([\d.]+)-\$([\d.]+)\)/g;
     const predictions: PredictionData = {};
     
@@ -104,24 +103,19 @@ function App() {
       });
 
       const data = await response.json();
-      let aiMessage: string = ''; // Always string, never null
+      let aiMessage: string = '';
       let predictionData: PredictionData | null = null;
 
       if (data.success) {
-        // Ensure aiMessage is always a string
         aiMessage = data.text || data.content || 'Here\'s the forecast you requested.';
-        
-        // Get prediction data
         predictionData = data.metadata?.raw_forecast || parsePredictionData(aiMessage, data);
-
-        // Get stock data
         const stockData = await parseStockInfo(aiMessage);
         
         setMessages(prev => [
           ...prev,
           { 
             role: 'assistant', 
-            content: aiMessage, // Now guaranteed to be string
+            content: aiMessage,
             ...(predictionData ? { predictionData } : {}),
             ...(stockData ? { stockData } : {})
           }
@@ -142,10 +136,21 @@ function App() {
 
   return (
     <div className="app-container">
-      <HistoryPanel 
-        history={history}
-        onSelect={(selectedQuery) => setQuery(selectedQuery)}
-      />
+      <div className={`collapsible-sidebar${sidebarOpen ? ' open' : ''}`}>
+        <button
+          className="sidebar-toggle-btn"
+          onClick={() => setSidebarOpen((open) => !open)}
+          aria-label="Toggle history panel"
+        >
+          <img src="/little_icon.jpeg" alt="Toggle history" />
+        </button>
+        <div className="history-panel">
+          <HistoryPanel 
+            history={history}
+            onSelect={(selectedQuery) => setQuery(selectedQuery)}
+          />
+        </div>
+      </div>
       
       <div className="main-content">
         <div className="header">
@@ -190,7 +195,7 @@ function App() {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Message Bro"
+              placeholder="Ask me about any stock"
             />
             <button type="submit">→</button>
           </form>
@@ -201,3 +206,4 @@ function App() {
 }
 
 export default App;
+

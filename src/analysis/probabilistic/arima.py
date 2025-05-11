@@ -180,7 +180,7 @@ class ARIMAModel:
         return forecast_dict
 
  # Example usage remains the same
-if __name__ == "__main__":
-    model = ARIMAModel(company='AAPL')
-    forecast = model.forecast(days=10)
-    print(forecast)
+# if __name__ == "__main__":
+#     model = ARIMAModel(company='AAPL')
+#     forecast = model.forecast(days=10)
+#     print(forecast)
