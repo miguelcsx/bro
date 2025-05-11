@@ -271,6 +271,6 @@ class HMMModel:
     
 
 # if __name__ == "__main__":
-#       model = HMMModel(company='AAPL')
-#       forecast = model.forecast(days=10)
-#       print(forecast)
+#        model = HMMModel(company='AAPL')
+#        forecast = model.forecast(days=10)
+#        print(forecast)

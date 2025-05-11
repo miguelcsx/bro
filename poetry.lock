@@ -116,6 +116,53 @@ files = [
 ]
 
 [[package]]
+name = "catboost"
+version = "1.2.8"
+description = "CatBoost Python Package"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "catboost-1.2.8-cp310-cp310-macosx_11_0_universal2.whl", hash = "sha256:8409c8a2e547469070d73681aa615b5e0b0d78367203d201b2f2b25c33cdcbad"},
+    {file = "catboost-1.2.8-cp310-cp310-manylinux2014_aarch64.whl", hash = "sha256:063020755d21de4f5434663a9b1d7cc1507c5b9254e2e8cd9cce9cd3b9ba4bbe"},
+    {file = "catboost-1.2.8-cp310-cp310-manylinux2014_x86_64.whl", hash = "sha256:5ac7c03a619d8eb86d70ec5748c1c9f09d4085033e3a760bf2f7c2892513c8a8"},
+    {file = "catboost-1.2.8-cp310-cp310-win_amd64.whl", hash = "sha256:b661840dc65e6ab4e62484dbf1556fed7736bb9196c6b5a3abb003cea39f0f91"},
+    {file = "catboost-1.2.8-cp311-cp311-macosx_11_0_universal2.whl", hash = "sha256:29526147f37aa356b94bd06513cf36ebcd5a83a9186cee25a8223b104c016b9b"},
+    {file = "catboost-1.2.8-cp311-cp311-manylinux2014_aarch64.whl", hash = "sha256:af140777a4062aabb4aed6731aee0737c6137dcdd5f7354b5d3b11033c1586ae"},
+    {file = "catboost-1.2.8-cp311-cp311-manylinux2014_x86_64.whl", hash = "sha256:810e00c9b570d449ebb2406183b9e1f8b8ce275b4eedeba750b24f088932264b"},
+    {file = "catboost-1.2.8-cp311-cp311-win_amd64.whl", hash = "sha256:8985dd217fe79161b05ed251c5f8a18130e2330d5c77559ac91b99b0cf781e6b"},
+    {file = "catboost-1.2.8-cp312-cp312-macosx_11_0_universal2.whl", hash = "sha256:29f93b4a89ef807e74c16882623c89f1fb781346e1f4fafb29b6949ab4603e14"},
+    {file = "catboost-1.2.8-cp312-cp312-manylinux2014_aarch64.whl", hash = "sha256:932542f8b416b43ee07f912a9a964635ccca7397da16b61475c76ae4ae96a1df"},
+    {file = "catboost-1.2.8-cp312-cp312-manylinux2014_x86_64.whl", hash = "sha256:35a70d32809a21d06dc0ba161bafdd0450ea71fe176a12ee85d7535883b22624"},
+    {file = "catboost-1.2.8-cp312-cp312-win_amd64.whl", hash = "sha256:319086796084fee5e4254300dc81aad1ae0b201cb576a9e87e6c7d030483be7e"},
+    {file = "catboost-1.2.8-cp313-cp313-macosx_11_0_universal2.whl", hash = "sha256:777987e1483824f93b9cb904860ef46dfb3cd184f879e47413bc7163b9514830"},
+    {file = "catboost-1.2.8-cp313-cp313-manylinux2014_aarch64.whl", hash = "sha256:a72681c50cbfe2fa4a6f85934bc707e0f7ff50a10a51801317418adf09d57cef"},
+    {file = "catboost-1.2.8-cp313-cp313-manylinux2014_x86_64.whl", hash = "sha256:8d2b58781c7ff2f974bde857da0d10d867366979193a4e7052746330a8b76b55"},
+    {file = "catboost-1.2.8-cp313-cp313-win_amd64.whl", hash = "sha256:9c04ab1df71501d75cad80757f33d60bab2704b2450401d2c8cf3f3bcb6bd9f8"},
+    {file = "catboost-1.2.8-cp38-cp38-macosx_11_0_universal2.whl", hash = "sha256:54677216e1fef3abfafd62b6dcb9dd151a31cb77b28bc399cff9386287d064cb"},
+    {file = "catboost-1.2.8-cp38-cp38-manylinux2014_aarch64.whl", hash = "sha256:0cc4b735c641011f4c4a10c8113619fe2407866ee33b0d37fd53d9f52fab6cff"},
+    {file = "catboost-1.2.8-cp38-cp38-manylinux2014_x86_64.whl", hash = "sha256:c27ed511bbcd78256cbe7de94ba7f2141d8fc3f95e6fa8f66c190f03f80fdac5"},
+    {file = "catboost-1.2.8-cp38-cp38-win_amd64.whl", hash = "sha256:b639da2386c364e2db52f11ade3335fbde11e139ba79bb47a34cb320d236c95b"},
+    {file = "catboost-1.2.8-cp39-cp39-macosx_11_0_universal2.whl", hash = "sha256:f486ae782a8a91b94e697f75270f5d6da53ab35ee55730a8787643d6be6dd8ef"},
+    {file = "catboost-1.2.8-cp39-cp39-manylinux2014_aarch64.whl", hash = "sha256:910d2596f114a073cb33a145f6114ffb5455b07581a29ec49f67d148cce52999"},
+    {file = "catboost-1.2.8-cp39-cp39-manylinux2014_x86_64.whl", hash = "sha256:9950130cac0a2a9c806386eb98c996d62bdedd638453082bb21a50bf11bf5e27"},
+    {file = "catboost-1.2.8-cp39-cp39-win_amd64.whl", hash = "sha256:a2b59f01c9b1631b8be03637bb7d48a4b1ef657c5d797ad0a9eba40e2be7c4cd"},
+    {file = "catboost-1.2.8.tar.gz", hash = "sha256:4a1d1aca5caecd919ec476f72c7abd98a704c24fda35506d4d7d71f77f07cb29"},
+]
+
+[package.dependencies]
+graphviz = "*"
+matplotlib = "*"
+numpy = ">=1.16.0,<3.0"
+pandas = ">=0.24"
+plotly = "*"
+scipy = "*"
+six = "*"
+
+[package.extras]
+widget = ["ipython", "ipywidgets (>=7.0,<9.0)", "traitlets"]
+
+[[package]]
 name = "certifi"
 version = "2025.4.26"
 description = "Python package for providing Mozilla's CA Bundle."
@@ -864,6 +911,23 @@ protobuf = ">=3.20.2,<4.21.1 || >4.21.1,<4.21.2 || >4.21.2,<4.21.3 || >4.21.3,<4
 grpc = ["grpcio (>=1.44.0,<2.0.0)"]
 
 [[package]]
+name = "graphviz"
+version = "0.20.3"
+description = "Simple Python interface for Graphviz"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "graphviz-0.20.3-py3-none-any.whl", hash = "sha256:81f848f2904515d8cd359cc611faba817598d2feaac4027b266aa3eda7b3dde5"},
+    {file = "graphviz-0.20.3.zip", hash = "sha256:09d6bc81e6a9fa392e7ba52135a9d49f1ed62526f96499325930e87ca1b5925d"},
+]
+
+[package.extras]
+dev = ["flake8", "pep8-naming", "tox (>=3)", "twine", "wheel"]
+docs = ["sphinx (>=5,<7)", "sphinx-autodoc-typehints", "sphinx-rtd-theme"]
+test = ["coverage", "pytest (>=7,<8.1)", "pytest-cov", "pytest-mock (>=3)"]
+
+[[package]]
 name = "greenlet"
 version = "3.2.1"
 description = "Lightweight in-process concurrent programming"
@@ -1554,6 +1618,32 @@ langsmith-pyo3 = ["langsmith-pyo3 (>=0.1.0rc2,<0.2.0)"]
 openai-agents = ["openai-agents (>=0.0.3,<0.1)"]
 otel = ["opentelemetry-api (>=1.30.0,<2.0.0)", "opentelemetry-exporter-otlp-proto-http (>=1.30.0,<2.0.0)", "opentelemetry-sdk (>=1.30.0,<2.0.0)"]
 pytest = ["pytest (>=7.0.0)", "rich (>=13.9.4,<14.0.0)"]
+
+[[package]]
+name = "lightgbm"
+version = "4.6.0"
+description = "LightGBM Python-package"
+optional = false
+python-versions = ">=3.7"
+groups = ["main"]
+files = [
+    {file = "lightgbm-4.6.0-py3-none-macosx_10_15_x86_64.whl", hash = "sha256:b7a393de8a334d5c8e490df91270f0763f83f959574d504c7ccb9eee4aef70ed"},
+    {file = "lightgbm-4.6.0-py3-none-macosx_12_0_arm64.whl", hash = "sha256:2dafd98d4e02b844ceb0b61450a660681076b1ea6c7adb8c566dfd66832aafad"},
+    {file = "lightgbm-4.6.0-py3-none-manylinux2014_aarch64.whl", hash = "sha256:4d68712bbd2b57a0b14390cbf9376c1d5ed773fa2e71e099cac588703b590336"},
+    {file = "lightgbm-4.6.0-py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:cb19b5afea55b5b61cbb2131095f50538bd608a00655f23ad5d25ae3e3bf1c8d"},
+    {file = "lightgbm-4.6.0-py3-none-win_amd64.whl", hash = "sha256:37089ee95664b6550a7189d887dbf098e3eadab03537e411f52c63c121e3ba4b"},
+    {file = "lightgbm-4.6.0.tar.gz", hash = "sha256:cb1c59720eb569389c0ba74d14f52351b573af489f230032a1c9f314f8bab7fe"},
+]
+
+[package.dependencies]
+numpy = ">=1.17.0"
+scipy = "*"
+
+[package.extras]
+arrow = ["cffi (>=1.15.1)", "pyarrow (>=6.0.1)"]
+dask = ["dask[array,dataframe,distributed] (>=2.0.0)", "pandas (>=0.24.0)"]
+pandas = ["pandas (>=0.24.0)"]
+scikit-learn = ["scikit-learn (>=0.24.2)"]
 
 [[package]]
 name = "markdown-it-py"
@@ -2858,6 +2948,31 @@ files = [
 windows-terminal = ["colorama (>=0.4.6)"]
 
 [[package]]
+name = "pykalman"
+version = "0.10.1"
+description = "An implementation of the Kalman Filter, Kalman Smoother, and EM algorithm in Python"
+optional = false
+python-versions = "<3.14,>=3.9"
+groups = ["main"]
+markers = "python_version < \"3.14\""
+files = [
+    {file = "pykalman-0.10.1-py2.py3-none-any.whl", hash = "sha256:769a531bfd8dd0c4de562794648220f5523567ef6bb7fac09daf1acdfa205b55"},
+    {file = "pykalman-0.10.1.tar.gz", hash = "sha256:c3019211d6551f6a84e9f08d3a6d11d5ace95d544e361b9cecc633041f74c139"},
+]
+
+[package.dependencies]
+numpy = "<3"
+packaging = "*"
+scikit-base = "<0.13.0"
+scipy = "<2.0.0"
+
+[package.extras]
+all = ["Sphinx (<9.0.0)", "jupyter", "numpydoc", "pre-commit", "pytest", "twine"]
+dev = ["pre-commit", "pytest"]
+docs = ["Sphinx (<9.0.0)", "jupyter", "numpydoc"]
+tests = ["pytest"]
+
+[[package]]
 name = "pyparsing"
 version = "3.2.3"
 description = "pyparsing module - Classes and methods to define and execute parsing grammars"
@@ -3080,6 +3195,27 @@ files = [
 
 [package.dependencies]
 pyasn1 = ">=0.1.3"
+
+[[package]]
+name = "scikit-base"
+version = "0.12.2"
+description = "Base classes for sklearn-like parametric objects"
+optional = false
+python-versions = "<3.14,>=3.9"
+groups = ["main"]
+markers = "python_version < \"3.14\""
+files = [
+    {file = "scikit_base-0.12.2-py3-none-any.whl", hash = "sha256:068092a9accb53c5d109eb2822333d67a2ca0d92553a97b0655de06f2fc35e7a"},
+    {file = "scikit_base-0.12.2.tar.gz", hash = "sha256:a09ef6c966288657275bd35554301303160c3b9d2eb755802515cf4034cb3f11"},
+]
+
+[package.extras]
+all-extras = ["numpy", "pandas"]
+binder = ["jupyter"]
+dev = ["pre-commit", "pytest", "pytest-cov", "scikit-learn (>=0.24.0)"]
+docs = ["Sphinx (!=7.2.0,<9.0.0)", "jupyter", "myst-parser", "nbsphinx (>=0.8.6)", "numpydoc", "pydata-sphinx-theme", "sphinx-design (<0.7.0)", "sphinx-gallery (<0.20.0)", "sphinx-issues (<6.0.0)", "sphinx-panels", "tabulate"]
+linters = ["black", "doc8", "flake8", "flake8-bugbear", "flake8-builtins", "flake8-comprehensions", "flake8-print", "flake8-quotes", "isort", "mypy", "nbqa", "pandas-vet", "pep8-naming", "pydocstyle"]
+test = ["coverage", "numpy", "pandas", "pytest", "pytest-cov", "safety", "scikit-learn (>=0.24.0)", "scipy"]
 
 [[package]]
 name = "scikit-learn"
@@ -4052,4 +4188,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "505535c0f330e75f6988aa500b57257d1f3ab9c490a9626bfb3e88b5b855f709"
+content-hash = "ce8581814bbbf35a048a4ce92e5a998daa9244c41e93e37392c0cd5e47408287"

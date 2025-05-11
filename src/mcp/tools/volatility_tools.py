@@ -10,7 +10,8 @@ from src.mcp.server import mcp_server
 from src.ingestion.clients import yahoo_client
 from src.analysis.volatility.garch import GARCHModel
 from src.analysis.volatility.xgboost_volatility import XGBoostVolatility
-from src.ingestion.clients.yahoo import YahooFinanceClient  # Ensure this is imported
+from src.analysis.volatility.rsi_measure import RSIModel
+from src.ingestion.clients.yahoo import YahooFinanceClient 
 import pandas as pd
 import json
 from datetime import datetime, timedelta
@@ -61,8 +62,6 @@ def garch_volatility(
             metadata={"company": company, "predict_col": predict_col}
         )
 
-
-
 @mcp_server.tool()
 def xgboost_volatility(
     company: str = Field(..., description="Company ticker symbol"),
@@ -107,4 +106,55 @@ def xgboost_volatility(
             type="text",
             text=f"Error: {str(e)}",
             metadata={"company": company, "predict_col": predict_col}
+        )
+    
+@mcp_server.tool()
+def rsi_analyzer(
+    company: str = Field(..., description="Company ticker symbol"),
+    window: int = Field(14, description="RSI calculation window (typically 14)"),
+    years_data: int = Field(2, description="Years of historical data to analyze"),
+    overbought: int = Field(70, description="Overbought threshold (70-100)"),
+    oversold: int = Field(30, description="Oversold threshold (0-30)")
+) -> TextContent:
+    """
+    RSI analysis tool with historical context and actionable insights
+    Returns structured data with current status, historical context, and recent values
+    """
+    try:
+        # Initialize model with shared configuration
+        rsi_model = RSIModel(
+            company=company,
+            window=window,
+            overbought=overbought,
+            oversold=oversold,
+            years_data=years_data,
+            client=yahoo_client  # Use shared Yahoo client
+        )
+
+        # Get structured analysis results
+        analysis_data = rsi_model.analyze()
+        
+        # Create human-readable summary
+        summary = (
+            f"RSI Analysis for {company}:\n"
+            f"Current RSI: {analysis_data['current_rsi']:.2f} ({analysis_data['status'].capitalize()})\n"
+            f"Recommended Action: {analysis_data['action']} ({analysis_data['confidence'].capitalize()} confidence)\n"
+            f"Historical Context: {analysis_data['historical_context']['days_overbought']} overbought days, "
+            f"{analysis_data['historical_context']['days_oversold']} oversold days"
+        )
+
+        return TextContent(
+            type="text",
+            text=summary,
+            metadata={
+                "company": company,
+                "raw_analysis": analysis_data  # Preserve full structured data
+            }
+        )
+        
+    except Exception as e:
+        return TextContent(
+            type="text",
+            text=f"RSI Analysis Error: {str(e)}",
+            metadata={"company": company}
         )
