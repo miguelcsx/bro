@@ -49,72 +49,98 @@ async def agent_process_query(query: str):
                 "messages": [{"role": "user", "content": query}],
             })
 
-            # Initialize prediction data as None
-            prediction_data = None
-            content_text = ""
-
-            # Check for prediction tools in the response
-            if isinstance(response, list):
-                # Look for prediction tool usage in the messages
-                for msg in response:
-                    msg_str = str(msg)
-                    
-                    # Check if this is a tool message with prediction data
-                    prediction_tools = ['forecast_stock', 'analyze_volatility', 'analyze_trend']
-                    if any(tool in msg_str for tool in prediction_tools):
-                        # Extract tool name and response
-                        for tool in prediction_tools:
-                            if tool in msg_str:
-                                # Try to extract the tool result which contains both text and data
-                                try:
-                                    # Look for ToolMessage with prediction data
-                                    # The pattern matches text like: ToolMessage(content='{"text": "...", "data": {...}}' ...
-                                    pattern = f"ToolMessage\\(content='([^']+)'[^)]*name='{tool}'[^)]*\\)"
-                                    match = re.search(pattern, msg_str)
-                                    
-                                    if match:
-                                        tool_content = match.group(1)
-                                        # Clean up the content string
-                                        tool_content = tool_content.replace('\\"', '"').replace("\\'", "'").replace("\\n", "")
-                                        
-                                        # Try to parse as JSON
-                                        try:
-                                            tool_result = json.loads(tool_content)
-                                            if "text" in tool_result and "data" in tool_result:
-                                                content_text = tool_result["text"]
-                                                prediction_data = tool_result["data"]
-                                                break
-                                        except json.JSONDecodeError:
-                                            pass
-                                except Exception as e:
-                                    print(f"Error extracting prediction data: {e}")
-
-                # If we didn't find structured prediction data, get the last AIMessage content
-                if not content_text:
-                    for msg in reversed(response):
-                        if hasattr(msg, 'content') and isinstance(msg.content, str) and msg.content.strip():
-                            content_text = msg.content.strip()
-                            break
-                
-                # Return both the content and prediction data if available
-                if prediction_data:
-                    return {
-                        "content": str(response),  # Keep the original full response for debugging
-                        "ai_response": content_text,  # Just the text part for display
-                        "predictions": prediction_data,  # Structured data for charts
-                        "success": True
-                    }
-                else:
-                    return {"content": str(response), "success": True}
-
-            # Handle direct AIMessage response (unlikely with tools)
-            elif hasattr(response, 'content') and isinstance(response.content, str):
-                return {"content": str(response), "success": True}
-
-            return {"content": str(response), "success": True}
+            # Parse and extract the relevant data from the response
+            extracted_data = extract_structured_data(response)
+            
+            # Return a consistently structured response
+            return {
+                "success": True,
+                "message": extracted_data["message"],
+                "data": extracted_data["data"]
+            }
 
     except Exception as e:
-        return {"error": str(e), "success": False}
+        return {"success": False, "message": str(e), "data": None}
+
+def extract_structured_data(response):
+    """
+    Extract structured data from agent responses in a consistent format.
+    Returns a dictionary with:
+    - message: The human-readable text response
+    - data: Structured data for visualization (if available)
+    """
+    result = {
+        "message": "",
+        "data": None
+    }
+    
+    try:
+        # Convert response to string for processing if it's not already
+        response_str = str(response)
+        
+        # Find the last AI message which contains the final response
+        ai_messages = re.findall(r"AIMessage\(content='([^']+)'", response_str)
+        if ai_messages:
+            result["message"] = ai_messages[-1]  # Get the last AI message
+        
+        # Look for stock quote tool message
+        tool_match = re.search(r"ToolMessage\(content=(.+?), name='get_stock_quote'", response_str, re.DOTALL)
+        if tool_match:
+            # Try to extract the JSON content from the tool message
+            content_str = tool_match.group(1)
+            
+            # Clean up the content string - handle both quoted and raw JSON
+            if content_str.startswith("'") and content_str.endswith("'"):
+                # Remove the outer quotes and unescape
+                content_str = content_str[1:-1].replace("\\'", "'").replace('\\"', '"').replace('\\n', '\n')
+                
+                try:
+                    # Try to parse as JSON
+                    stock_data = json.loads(content_str)
+                    
+                    # Extract only the most relevant data for the frontend
+                    result["data"] = {
+                        "type": "stock_quote",
+                        "symbol": stock_data.get("symbol"),
+                        "name": stock_data.get("longName") or stock_data.get("shortName"),
+                        "price": stock_data.get("currentPrice") or stock_data.get("regularMarketPrice"),
+                        "currency": stock_data.get("currency", "USD"),
+                        "change": stock_data.get("regularMarketChange"),
+                        "changePercent": stock_data.get("regularMarketChangePercent"),
+                        "marketState": stock_data.get("marketState"),
+                        "details": {
+                            "previousClose": stock_data.get("previousClose"),
+                            "open": stock_data.get("open"),
+                            "dayLow": stock_data.get("dayLow") or stock_data.get("regularMarketDayLow"),
+                            "dayHigh": stock_data.get("dayHigh") or stock_data.get("regularMarketDayHigh"),
+                            "volume": stock_data.get("volume") or stock_data.get("regularMarketVolume"),
+                            "averageVolume": stock_data.get("averageVolume"),
+                            "fiftyTwoWeekLow": stock_data.get("fiftyTwoWeekLow"),
+                            "fiftyTwoWeekHigh": stock_data.get("fiftyTwoWeekHigh"),
+                        },
+                        "company": {
+                            "sector": stock_data.get("sector"),
+                            "industry": stock_data.get("industry"),
+                            "country": stock_data.get("country"),
+                            "employees": stock_data.get("fullTimeEmployees"),
+                            "website": stock_data.get("website"),
+                            "summary": stock_data.get("longBusinessSummary")
+                        }
+                    }
+                except json.JSONDecodeError:
+                    pass
+        
+        # Check for prediction data
+        prediction_match = re.search(r"raw_forecast", response_str)
+        if prediction_match:
+            # Process prediction data logic here
+            pass
+            
+        return result
+            
+    except Exception as e:
+        print(f"Error extracting structured data: {e}")
+        return {"message": "Unable to process response", "data": None}
 
 if __name__ == "__main__":
     uvicorn.run("src.main:app", host="0.0.0.0", port=8888, reload=True)
