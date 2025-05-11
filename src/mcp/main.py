@@ -11,7 +11,7 @@ def main():
         "src.mcp.main:app",
         host="localhost",
         port=5555,
-        reload=True
+        reload=False
     )
 
 if __name__ == "__main__":

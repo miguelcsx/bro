@@ -4,6 +4,19 @@
 
 Build to simplify complex financial data and help you make smarter decisions, faster.
 
+## How to Use It
+
+1. **Launch the application** by following the installation instructions or using Docker Compose (see below).
+2. **Access the web interface** at [http://localhost:3000](http://localhost:3000).
+3. In the chat box, enter your questions about stocks, for example:
+   - "What will be Google's closing price tomorrow?"
+   - "Predict Tesla's stock using LSTM with 3 years of data."
+   - "Forecast Amazon's price for next week."
+4. The assistant will respond with analysis, predictions, and interactive charts.
+5. You can query different companies, models, and time periods.
+
+---
+
 ## Features
 
 - AI-powered financial assistant  
@@ -120,7 +133,8 @@ You can ask the assistant questions about stocks, such as:
 
 ## Api Key
 
-In order to use Bro on your local machine, you must create a `.env` file and set the `GEMINI_API_KEY=api_key variable`. For the development of this project, we used a free trial Gemini API key. We want you to be able to use it as well, so we've created a new Gemini API key with a free trial (note: this means only a limited number of questions and attempts are allowed before reaching the token limit). However, it is perfectly suitable for trying out Bro. The api key is: `AIzaSyDOqUQzvkNoDPgFZVggPTTa55eXvAZhP9Y`
+In order to use Bro on your local machine, you must create a `.env` file and set the `GEMINI_API_KEY=api_key variable`. For the development of this project, we used a free trial Gemini API key. We want you to be able to use it as well, so we've created a new Gemini API key with a free trial (note: this means only a limited number of questions and attempts are allowed before reaching the token limit). However, it is perfectly suitable for trying out Bro. The api key is: `AIzaSyDOqUQzvkNoDPgFZVggPTTa55eXvAZhP9Y, we provide you this in order to test it easily. 
+We know this seems unsafe, but it is only for community use.
 
 ## References
 

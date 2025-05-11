@@ -2,12 +2,13 @@
 Tralalelo tralala
 """
 
-from typing import List
+from typing import List, Dict, Any
 from mcp.types import TextContent
 from pydantic import Field
 from src.mcp.server import mcp_server
 from src.ingestion.clients import yahoo_client
-from datetime import datetime
+from datetime import datetime, timedelta
+import json
 
 
 @mcp_server.tool()
@@ -64,3 +65,14 @@ def get_current_date() -> TextContent:
     Get current date
     """
     return datetime.now().strftime("%Y-%m-%d")
+
+
+@mcp_server.tool()
+def get_stock_news(symbol: str):
+    """
+    Get news for a given symbol
+    """
+    news_data = yahoo_client.get_news(symbol)
+    
+    # Format the news data into a more structured format
+    return news_data
